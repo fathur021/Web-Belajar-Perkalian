@@ -24,10 +24,10 @@
 
     h4 {
       color: #0077cc;
-      margin-bottom: 30px;
+      margin-bottom: 20px;
     }
 
-    /* ======================== PENA ======================== */
+    /* PENANYA DI LUAR */
     #pena-container {
       margin-bottom: 25px;
     }
@@ -35,15 +35,15 @@
     .pena {
       font-size: 36px;
       cursor: grab;
-      margin: 12px; 
+      margin: 12px;
       transition: transform 0.2s;
     }
 
     .pena:hover {
-      transform: scale(1.3);
+      transform: scale(1.2);
     }
 
-    /* ======================== GELAS ======================== */
+    /* GELAS */
     #gelas-container {
       display: flex;
       justify-content: center;
@@ -59,8 +59,8 @@
     }
 
     .gelas {
-      width: 90px;              /* DIPERKECIL */
-      min-height: 100px;        /* DIPERKECIL */
+      width: 90px;
+      min-height: 100px;
       background: #fff;
       border: 4px solid #00aaff;
       border-radius: 15px;
@@ -71,13 +71,23 @@
       align-items: flex-start;
       position: relative;
       padding: 8px;
-      gap: 6px;                /* Jarak pena di dalam gelas diperbagus */
+      gap: 6px;
       transition: 0.2s;
     }
 
     .gelas:hover {
       background: #e8faff;
       transform: scale(1.05);
+    }
+
+    .pena-dalam-gelas {
+      font-size: 26px;
+      cursor: grab;
+      transition: transform 0.2s;
+    }
+
+    .pena-dalam-gelas:hover {
+      transform: scale(1.2);
     }
 
     .jumlah-pena {
@@ -87,11 +97,7 @@
       font-size: 14px;
     }
 
-    .pena-dalam-gelas {
-      font-size: 26px;
-    }
-
-    /* ======================== SOAL ======================== */
+    /* SOAL */
     .soal-container {
       background: #fff3cd;
       border: 2px solid #ffe082;
@@ -99,7 +105,7 @@
       padding: 20px;
       display: inline-block;
       box-shadow: 3px 3px 0 #f9a825;
-      margin-top: 30px;
+      margin-top: 25px;
     }
 
     .soal-container input {
@@ -110,7 +116,7 @@
       font-weight: bold;
     }
 
-    /* ======================== BUTTON ======================== */
+    /* BUTTON RESET */
     .btn-reset {
       background-color: #ffb347;
       border: none;
@@ -130,17 +136,23 @@
     .img-decor {
       width: 120px;
     }
+
+    /* Animasi drag */
+    .dragging {
+      opacity: 0.4;
+      transform: scale(1.1);
+    }
   </style>
 </head>
 <body>
 
   <div class="container">
     <h1>🧮 Belajar Perkalian dengan Pena dan Gelas 🎨</h1>
-    <h4>Seret pena ✏️ ke dalam gelas, lalu hitung hasil perkaliannya!</h4>
+    <h4>Seret pena ✏️ ke dalam gelas, keluarkan lagi jika salah!</h4>
 
     <img src="https://cdn-icons-png.flaticon.com/512/1048/1048945.png" class="img-decor mb-3" alt="Anak belajar">
 
-    <!-- Pena -->
+    <!-- PENA -->
     <div id="pena-container" class="d-flex justify-content-center flex-wrap">
       <span class="pena" draggable="true">✏️</span>
       <span class="pena" draggable="true">✏️</span>
@@ -154,14 +166,14 @@
       <span class="pena" draggable="true">✏️</span>
     </div>
 
-    <!-- Gelas -->
+    <!-- GELAS -->
     <div id="gelas-container"></div>
 
-    <!-- Soal -->
-    <div class="soal-container mt-4">
+    <!-- SOAL -->
+    <div class="soal-container">
       <h4 id="soal-teks">Berapa hasil dari 0 × 0 ?</h4>
       <input type="number" id="jawaban" placeholder="?" />
-      <button class="btn btn-success ms-2" onclick="cekJawaban()">✅ Cek Jawaban</button>
+      <button class="btn btn-success ms-2" onclick="cekJawaban()">Cek</button>
     </div>
 
     <button class="btn-reset mt-3" onclick="resetSemua()">🔁 Ulangi Permainan</button>
@@ -184,151 +196,134 @@
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 
   <script>
-  const gelasContainer = document.getElementById("gelas-container");
-  const soalTeks = document.getElementById("soal-teks");
-  const penaContainer = document.getElementById("pena-container");
-  let jawabanBenar = 0;
+    const gelasContainer = document.getElementById("gelas-container");
+    const soalTeks = document.getElementById("soal-teks");
+    let jawabanBenar = 0;
 
-  // Buat 10 gelas
-  for (let i = 1; i <= 10; i++) {
-    const wrapper = document.createElement("div");
-    wrapper.classList.add("gelas-wrapper");
+    // Buat 10 gelas
+    for (let i = 1; i <= 10; i++) {
+      const wrapper = document.createElement("div");
+      wrapper.classList.add("gelas-wrapper");
 
-    const gelas = document.createElement("div");
-    gelas.classList.add("gelas");
-    gelas.dataset.jumlah = 0;
+      const gelas = document.createElement("div");
+      gelas.classList.add("gelas");
+      gelas.dataset.jumlah = 0;
 
-    const jumlahLabel = document.createElement("div");
-    jumlahLabel.classList.add("jumlah-pena");
-    jumlahLabel.innerText = "0 pena";
+      const jumlahLabel = document.createElement("div");
+      jumlahLabel.classList.add("jumlah-pena");
+      jumlahLabel.innerText = "0 pena";
 
-    // Event agar gelas bisa menerima pena
-    gelas.addEventListener("dragover", e => e.preventDefault());
-    gelas.addEventListener("drop", e => dropKeGelas(e, gelas, jumlahLabel));
+      gelas.addEventListener("dragover", e => e.preventDefault());
+      gelas.addEventListener("drop", e => dropPena(e, gelas, jumlahLabel));
 
-    wrapper.appendChild(gelas);
-    wrapper.appendChild(jumlahLabel);
-    gelasContainer.appendChild(wrapper);
-  }
+      wrapper.appendChild(gelas);
+      wrapper.appendChild(jumlahLabel);
+      gelasContainer.appendChild(wrapper);
+    }
 
-  // Semua pena awal bisa di-drag
-  document.querySelectorAll(".pena").forEach(pena => {
-    pena.addEventListener("dragstart", e => {
-      e.dataTransfer.setData("tipe", "pena-luar");
-      e.dataTransfer.setData("id", Date.now()); // ID unik jika perlu
-      e.target.classList.add("dragging");
+    // Pena luar bisa di-drag
+    document.querySelectorAll(".pena").forEach(pena => {
+      pena.addEventListener("dragstart", e => {
+        e.dataTransfer.setData("text/plain", "pena");
+      });
     });
-  });
 
-  // Area pena awal agar bisa menerima pena dari gelas
-  penaContainer.addEventListener("dragover", e => e.preventDefault());
-  penaContainer.addEventListener("drop", e => dropKePena(e));
-
-  // Drop pena ke gelas
-  function dropKeGelas(e, gelas, jumlahLabel) {
-    e.preventDefault();
-    const tipe = e.dataTransfer.getData("tipe");
-
-    let newPena;
-    if (tipe === "pena-luar") {
-      // Dari luar langsung buat baru
-      newPena = document.createElement("span");
+    // Buat pena dalam gelas
+    function buatPenaDalamGelas() {
+      const newPena = document.createElement("span");
       newPena.textContent = "✏️";
       newPena.classList.add("pena-dalam-gelas");
-    } else if (tipe === "pena-dalam") {
-      // Dari gelas lain → ambil element dragging
-      newPena = document.querySelector(".dragging");
-      newPena.classList.remove("dragging");
-    }
+      newPena.draggable = true;
 
-    if (newPena) {
-      // Pastikan ukuran & style tetap
-      newPena.setAttribute("draggable", "true");
-
-      // Event dragstart untuk pena dalam gelas
-      newPena.addEventListener("dragstart", function(e) {
-        e.dataTransfer.setData("tipe", "pena-dalam");
-        this.classList.add("dragging");
+      newPena.addEventListener("dragstart", e => {
+        e.dataTransfer.setData("text/plain", "keluar");
+        e.target.classList.add("dragging");
       });
 
-      gelas.appendChild(newPena);
-      gelas.dataset.jumlah = parseInt(gelas.dataset.jumlah) + 1;
-      jumlahLabel.innerText = `${gelas.dataset.jumlah} pena`;
-    }
-  }
+      newPena.addEventListener("dragend", e => {
+        e.target.classList.remove("dragging");
+      });
 
-  // Drop pena kembali ke area asal (keluar dari gelas)
-  function dropKePena(e) {
-    e.preventDefault();
-    const dragging = document.querySelector(".dragging");
-    if (!dragging) return;
-
-    dragging.classList.remove("dragging");
-
-    // Jika pena berasal dari gelas, kurangi hitungannya
-    const parentGelas = dragging.closest(".gelas");
-    if (parentGelas) {
-      const label = parentGelas.parentElement.querySelector(".jumlah-pena");
-      parentGelas.dataset.jumlah = parseInt(parentGelas.dataset.jumlah) - 1;
-      label.innerText = `${parentGelas.dataset.jumlah} pena`;
+      return newPena;
     }
 
-    // Hapus style pena dalam gelas
-    dragging.classList.remove("pena-dalam-gelas");
+    // Masukkan pena ke dalam gelas
+    function dropPena(e, gelas, jumlahLabel) {
+      e.preventDefault();
 
-    // Tambahkan kembali ke area pena awal
-    dragging.classList.add("pena");
-    dragging.style.fontSize = "36px";
-    dragging.style.cursor = "grab";
+      const jenis = e.dataTransfer.getData("text/plain");
 
-    penaContainer.appendChild(dragging);
-  }
+      if (jenis === "pena") {
+        const newPena = buatPenaDalamGelas();
+        gelas.appendChild(newPena);
 
-  // Buat soal acak
-  function buatSoal() {
-    const a = Math.floor(Math.random() * 6) + 1;
-    const b = Math.floor(Math.random() * 6) + 1;
-    jawabanBenar = a * b;
-    soalTeks.innerText = `Berapa hasil dari ${a} × ${b} ?`;
-  }
-  buatSoal();
-
-  // Cek jawaban
-  function cekJawaban() {
-    const jawabanUser = parseInt(document.getElementById("jawaban").value);
-    const modal = new bootstrap.Modal(document.getElementById('modalHasil'));
-    const judulModal = document.getElementById('judulModal');
-    const isiModal = document.getElementById('isiModal');
-
-    if (jawabanUser === jawabanBenar) {
-      judulModal.innerText = "🌟 Hebat Sekali!";
-      isiModal.innerHTML = `<p>Jawaban kamu benar! 😍<br><b>${jawabanUser}</b> adalah hasil perkalian yang tepat!</p>`;
-      modal.show();
-      buatSoal();
-    } else {
-      judulModal.innerText = "😅 Coba Lagi!";
-      isiModal.innerHTML = `<p>Jawaban kamu salah, coba lagi ya! 😊</p>`;
-      modal.show();
+        gelas.dataset.jumlah = parseInt(gelas.dataset.jumlah) + 1;
+        jumlahLabel.innerText = `${gelas.dataset.jumlah} pena`;
+      }
     }
 
-    document.getElementById("jawaban").value = "";
-  }
+    // Keluarkan pena dari gelas
+    document.body.addEventListener("dragover", e => e.preventDefault());
 
-  // Reset semua gelas & soal
-  function resetSemua() {
-    document.querySelectorAll(".gelas").forEach(g => {
-      g.innerHTML = "";
-      g.dataset.jumlah = 0;
+    document.body.addEventListener("drop", e => {
+      const penaSedangDiDrag = document.querySelector(".dragging");
+
+      if (penaSedangDiDrag && penaSedangDiDrag.classList.contains("pena-dalam-gelas")) {
+
+        const gelas = penaSedangDiDrag.parentElement;
+        const jumlahLabel = gelas.nextSibling;
+
+        penaSedangDiDrag.remove();
+
+        gelas.dataset.jumlah = parseInt(gelas.dataset.jumlah) - 1;
+        jumlahLabel.innerText = `${gelas.dataset.jumlah} pena`;
+      }
     });
 
-    document.querySelectorAll(".jumlah-pena").forEach(l => {
-      l.innerText = "0 pena";
-    });
-
+    // Buat soal acak
+    function buatSoal() {
+      const a = Math.floor(Math.random() * 6) + 1;
+      const b = Math.floor(Math.random() * 6) + 1;
+      jawabanBenar = a * b;
+      soalTeks.innerText = `Berapa hasil dari ${a} × ${b} ?`;
+    }
     buatSoal();
-  }
-</script>
 
+    // Cek jawaban
+    function cekJawaban() {
+      const jawabanUser = parseInt(document.getElementById("jawaban").value);
+      const modal = new bootstrap.Modal(document.getElementById('modalHasil'));
+      const judulModal = document.getElementById('judulModal');
+      const isiModal = document.getElementById('isiModal');
+
+      if (jawabanUser === jawabanBenar) {
+        judulModal.innerText = "🌟 Hebat Sekali!";
+        isiModal.innerHTML = `<p>Jawaban kamu benar! 😍<br><b>${jawabanUser}</b> adalah hasil perkalian yang tepat!</p>`;
+        modal.show();
+        buatSoal();
+      } else {
+        judulModal.innerText = "😅 Coba Lagi!";
+        isiModal.innerHTML = `<p>Jawaban kamu salah, coba lagi ya! 😊</p>`;
+        modal.show();
+      }
+
+      document.getElementById("jawaban").value = "";
+    }
+
+    // Reset permainan
+    function resetSemua() {
+      document.querySelectorAll(".gelas").forEach(g => {
+        g.innerHTML = "";
+        g.dataset.jumlah = 0;
+      });
+
+      document.querySelectorAll(".jumlah-pena").forEach(l => {
+        l.innerText = "0 pena";
+      });
+
+      buatSoal();
+    }
+  </script>
 
 </body>
 </html>
