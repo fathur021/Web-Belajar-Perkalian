@@ -27,6 +27,7 @@
       margin-bottom: 30px;
     }
 
+    /* ======================== PENA ======================== */
     #pena-container {
       margin-bottom: 25px;
     }
@@ -34,7 +35,7 @@
     .pena {
       font-size: 36px;
       cursor: grab;
-      margin: 5px;
+      margin: 12px; 
       transition: transform 0.2s;
     }
 
@@ -42,12 +43,13 @@
       transform: scale(1.3);
     }
 
+    /* ======================== GELAS ======================== */
     #gelas-container {
       display: flex;
       justify-content: center;
       flex-wrap: wrap;
-      gap: 25px;
-      margin-bottom: 30px;
+      gap: 18px;
+      margin-bottom: 20px;
     }
 
     .gelas-wrapper {
@@ -57,18 +59,20 @@
     }
 
     .gelas {
-      width: 90px;
-      height: 120px;
+      width: 90px;              /* DIPERKECIL */
+      min-height: 100px;        /* DIPERKECIL */
       background: #fff;
       border: 4px solid #00aaff;
       border-radius: 15px;
       box-shadow: 0 4px 8px rgba(0,0,0,0.2);
       display: flex;
+      flex-wrap: wrap;
       justify-content: center;
-      align-items: flex-end;
+      align-items: flex-start;
       position: relative;
-      padding-bottom: 5px;
-      transition: transform 0.2s, background 0.3s;
+      padding: 8px;
+      gap: 6px;                /* Jarak pena di dalam gelas diperbagus */
+      transition: 0.2s;
     }
 
     .gelas:hover {
@@ -77,25 +81,36 @@
     }
 
     .jumlah-pena {
-      margin-top: 10px;
+      margin-top: 8px;
       font-weight: bold;
       color: #ff4081;
-      font-size: 16px;
-    }
-
-    #hasil {
-      font-size: 22px;
-      font-weight: bold;
-      color: #00796b;
-      margin-top: 20px;
+      font-size: 14px;
     }
 
     .pena-dalam-gelas {
-      position: absolute;
-      bottom: 5px;
       font-size: 26px;
     }
 
+    /* ======================== SOAL ======================== */
+    .soal-container {
+      background: #fff3cd;
+      border: 2px solid #ffe082;
+      border-radius: 15px;
+      padding: 20px;
+      display: inline-block;
+      box-shadow: 3px 3px 0 #f9a825;
+      margin-top: 30px;
+    }
+
+    .soal-container input {
+      border: 2px solid #ffb300;
+      border-radius: 10px;
+      width: 60px;
+      text-align: center;
+      font-weight: bold;
+    }
+
+    /* ======================== BUTTON ======================== */
     .btn-reset {
       background-color: #ffb347;
       border: none;
@@ -115,24 +130,6 @@
     .img-decor {
       width: 120px;
     }
-
-    .soal-container {
-      background: #fff3cd;
-      border: 2px solid #ffe082;
-      border-radius: 15px;
-      padding: 20px;
-      display: inline-block;
-      box-shadow: 3px 3px 0 #f9a825;
-      margin-top: 30px;
-    }
-
-    .soal-container input {
-      border: 2px solid #ffb300;
-      border-radius: 10px;
-      width: 60px;
-      text-align: center;
-      font-weight: bold;
-    }
   </style>
 </head>
 <body>
@@ -145,7 +142,6 @@
 
     <!-- Pena -->
     <div id="pena-container" class="d-flex justify-content-center flex-wrap">
-      <!-- Tambahkan 10 pena -->
       <span class="pena" draggable="true">✏️</span>
       <span class="pena" draggable="true">✏️</span>
       <span class="pena" draggable="true">✏️</span>
@@ -160,9 +156,6 @@
 
     <!-- Gelas -->
     <div id="gelas-container"></div>
-
-    <!-- Total -->
-    <div id="hasil">Total Pena: 0</div>
 
     <!-- Soal -->
     <div class="soal-container mt-4">
@@ -193,17 +186,7 @@
   <script>
     const gelasContainer = document.getElementById("gelas-container");
     const soalTeks = document.getElementById("soal-teks");
-    let totalPena = 0;
     let jawabanBenar = 0;
-
-    // Gambar lucu gelas
-    const gambarGelas = [
-      "https://cdn-icons-png.flaticon.com/512/4151/4151022.png",
-      "https://cdn-icons-png.flaticon.com/512/868/868786.png",
-      "https://cdn-icons-png.flaticon.com/512/4151/4151016.png",
-      "https://cdn-icons-png.flaticon.com/512/1670/1670946.png",
-      "https://cdn-icons-png.flaticon.com/512/4151/4151007.png"
-    ];
 
     // Buat 10 gelas
     for (let i = 1; i <= 10; i++) {
@@ -214,35 +197,26 @@
       gelas.classList.add("gelas");
       gelas.dataset.jumlah = 0;
 
-      const img = document.createElement("img");
-      img.src = gambarGelas[(i - 1) % gambarGelas.length]; // ulangi jika lebih dari 5
-      img.alt = "Gelas lucu";
-      img.style.position = "absolute";
-      img.style.bottom = "0";
-      img.style.width = "60px";
-      img.style.opacity = "0.3";
-      gelas.appendChild(img);
+      gelas.addEventListener("dragover", e => e.preventDefault());
+      gelas.addEventListener("drop", e => dropPena(e, gelas, jumlahLabel));
 
       const jumlahLabel = document.createElement("div");
       jumlahLabel.classList.add("jumlah-pena");
       jumlahLabel.innerText = "0 pena";
-
-      gelas.addEventListener("dragover", e => e.preventDefault());
-      gelas.addEventListener("drop", e => dropPena(e, gelas, jumlahLabel));
 
       wrapper.appendChild(gelas);
       wrapper.appendChild(jumlahLabel);
       gelasContainer.appendChild(wrapper);
     }
 
-    // Pena bisa diseret
-    const penaList = document.querySelectorAll(".pena");
-    penaList.forEach(pena => {
+    // Pena bisa di-drag
+    document.querySelectorAll(".pena").forEach(pena => {
       pena.addEventListener("dragstart", e => {
         e.dataTransfer.setData("text/plain", "pena");
       });
     });
 
+    // Drop pena ke gelas
     function dropPena(e, gelas, jumlahLabel) {
       e.preventDefault();
 
@@ -250,19 +224,13 @@
       newPena.textContent = "✏️";
       newPena.classList.add("pena-dalam-gelas");
 
-      const offset = parseInt(gelas.dataset.jumlah) * 10;
-      newPena.style.bottom = `${5 + offset}px`;
-
       gelas.appendChild(newPena);
 
       gelas.dataset.jumlah = parseInt(gelas.dataset.jumlah) + 1;
       jumlahLabel.innerText = `${gelas.dataset.jumlah} pena`;
-
-      totalPena++;
-      document.getElementById("hasil").innerText = `Total Pena: ${totalPena}`;
     }
 
-    // Soal acak perkalian (hanya sampai 6)
+    // Buat soal acak
     function buatSoal() {
       const a = Math.floor(Math.random() * 6) + 1;
       const b = Math.floor(Math.random() * 6) + 1;
@@ -281,30 +249,28 @@
       if (jawabanUser === jawabanBenar) {
         judulModal.innerText = "🌟 Hebat Sekali!";
         isiModal.innerHTML = `<p>Jawaban kamu benar! 😍<br><b>${jawabanUser}</b> adalah hasil perkalian yang tepat!</p>`;
+        modal.show();
+        buatSoal();
       } else {
-        judulModal.innerText = "😅 Coba Lagi Yuk!";
-        isiModal.innerHTML = `<p>Jawaban kamu salah. Jawaban yang benar adalah <b>${jawabanBenar}</b>.</p>`;
+        judulModal.innerText = "😅 Coba Lagi!";
+        isiModal.innerHTML = `<p>Jawaban kamu salah, coba lagi ya! 😊</p>`;
+        modal.show();
       }
-      modal.show();
-      buatSoal();
+
       document.getElementById("jawaban").value = "";
     }
 
+    // Reset semua gelas & soal
     function resetSemua() {
-      totalPena = 0;
-      document.getElementById("hasil").innerText = "Total Pena: 0";
       document.querySelectorAll(".gelas").forEach(g => {
         g.innerHTML = "";
         g.dataset.jumlah = 0;
-        const img = document.createElement("img");
-        img.src = gambarGelas[0];
-        img.style.position = "absolute";
-        img.style.bottom = "0";
-        img.style.width = "60px";
-        img.style.opacity = "0.3";
-        g.appendChild(img);
       });
-      document.querySelectorAll(".jumlah-pena").forEach(l => l.innerText = "0 pena");
+
+      document.querySelectorAll(".jumlah-pena").forEach(l => {
+        l.innerText = "0 pena";
+      });
+
       buatSoal();
     }
   </script>
