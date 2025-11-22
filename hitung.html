@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Belajar Perkalian: Pena & Gelas</title>
+  <title>Belajar Perkalian: Objek Lucu</title>
 
   <!-- Bootstrap -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -27,7 +27,6 @@
       margin-bottom: 20px;
     }
 
-    /* PENANYA DI LUAR */
     #pena-container {
       margin-bottom: 25px;
     }
@@ -43,7 +42,6 @@
       transform: scale(1.2);
     }
 
-    /* GELAS */
     #gelas-container {
       display: flex;
       justify-content: center;
@@ -81,7 +79,7 @@
     }
 
     .pena-dalam-gelas {
-      font-size: 26px;
+      font-size: 28px;
       cursor: grab;
       transition: transform 0.2s;
     }
@@ -97,7 +95,6 @@
       font-size: 14px;
     }
 
-    /* SOAL */
     .soal-container {
       background: #fff3cd;
       border: 2px solid #ffe082;
@@ -116,7 +113,6 @@
       font-weight: bold;
     }
 
-    /* BUTTON RESET */
     .btn-reset {
       background-color: #ffb347;
       border: none;
@@ -133,11 +129,6 @@
       transform: scale(1.05);
     }
 
-    .img-decor {
-      width: 120px;
-    }
-
-    /* Animasi drag */
     .dragging {
       opacity: 0.4;
       transform: scale(1.1);
@@ -147,23 +138,23 @@
 <body>
 
   <div class="container">
-    <h1>🧮 Belajar Perkalian dengan Pena dan Gelas 🎨</h1>
-    <h4>Seret pena ✏️ ke dalam gelas, keluarkan lagi jika salah!</h4>
+    <h1>🧮 Belajar Perkalian dengan Objek Lucu 🎨</h1>
+    <h4>Seret objek ke dalam gelas, keluarkan lagi jika salah!</h4>
 
-    <img src="https://cdn-icons-png.flaticon.com/512/1048/1048945.png" class="img-decor mb-3" alt="Anak belajar">
+    <img src="https://cdn-icons-png.flaticon.com/512/1048/1048945.png" class="img-decor mb-3" width="120">
 
-    <!-- PENA -->
+    <!-- OBJEK -->
     <div id="pena-container" class="d-flex justify-content-center flex-wrap">
       <span class="pena" draggable="true">✏️</span>
-      <span class="pena" draggable="true">✏️</span>
-      <span class="pena" draggable="true">✏️</span>
-      <span class="pena" draggable="true">✏️</span>
-      <span class="pena" draggable="true">✏️</span>
-      <span class="pena" draggable="true">✏️</span>
-      <span class="pena" draggable="true">✏️</span>
-      <span class="pena" draggable="true">✏️</span>
-      <span class="pena" draggable="true">✏️</span>
-      <span class="pena" draggable="true">✏️</span>
+      <span class="pena" draggable="true">🍭</span>
+      <span class="pena" draggable="true">🍦</span>
+      <span class="pena" draggable="true">🧸</span>
+      <span class="pena" draggable="true">🌸</span>
+      <span class="pena" draggable="true">⭐</span>
+      <span class="pena" draggable="true">🍎</span>
+      <span class="pena" draggable="true">🦋</span>
+      <span class="pena" draggable="true">🐱</span>
+      <span class="pena" draggable="true">🐶</span>
     </div>
 
     <!-- GELAS -->
@@ -211,7 +202,7 @@
 
       const jumlahLabel = document.createElement("div");
       jumlahLabel.classList.add("jumlah-pena");
-      jumlahLabel.innerText = "0 pena";
+      jumlahLabel.innerText = "0 item";
 
       gelas.addEventListener("dragover", e => e.preventDefault());
       gelas.addEventListener("drop", e => dropPena(e, gelas, jumlahLabel));
@@ -221,62 +212,61 @@
       gelasContainer.appendChild(wrapper);
     }
 
-    // Pena luar bisa di-drag
-    document.querySelectorAll(".pena").forEach(pena => {
-      pena.addEventListener("dragstart", e => {
-        e.dataTransfer.setData("text/plain", "pena");
+    // Objek bisa di-drag
+    document.querySelectorAll(".pena").forEach(item => {
+      item.addEventListener("dragstart", e => {
+        e.dataTransfer.setData("item", e.target.textContent);
       });
     });
 
-    // Buat pena dalam gelas
-    function buatPenaDalamGelas() {
-      const newPena = document.createElement("span");
-      newPena.textContent = "✏️";
-      newPena.classList.add("pena-dalam-gelas");
-      newPena.draggable = true;
+    // Buat objek dalam gelas
+    function buatPenaDalamGelas(emoji) {
+      const newItem = document.createElement("span");
+      newItem.textContent = emoji;
+      newItem.classList.add("pena-dalam-gelas");
+      newItem.draggable = true;
 
-      newPena.addEventListener("dragstart", e => {
-        e.dataTransfer.setData("text/plain", "keluar");
-        e.target.classList.add("dragging");
+      newItem.addEventListener("dragstart", e => {
+        e.dataTransfer.setData("item", emoji);
+        newItem.classList.add("dragging");
       });
 
-      newPena.addEventListener("dragend", e => {
-        e.target.classList.remove("dragging");
+      newItem.addEventListener("dragend", () => {
+        newItem.classList.remove("dragging");
       });
 
-      return newPena;
+      return newItem;
     }
 
-    // Masukkan pena ke dalam gelas
+    // Drop objek ke gelas
     function dropPena(e, gelas, jumlahLabel) {
       e.preventDefault();
 
-      const jenis = e.dataTransfer.getData("text/plain");
-
-      if (jenis === "pena") {
-        const newPena = buatPenaDalamGelas();
-        gelas.appendChild(newPena);
+      const emoji = e.dataTransfer.getData("item");
+      if (emoji) {
+        const newItem = buatPenaDalamGelas(emoji);
+        gelas.appendChild(newItem);
 
         gelas.dataset.jumlah = parseInt(gelas.dataset.jumlah) + 1;
-        jumlahLabel.innerText = `${gelas.dataset.jumlah} pena`;
+        jumlahLabel.innerText = `${gelas.dataset.jumlah} item`;
       }
     }
 
-    // Keluarkan pena dari gelas
+    // Keluarkan objek dari gelas
     document.body.addEventListener("dragover", e => e.preventDefault());
 
     document.body.addEventListener("drop", e => {
-      const penaSedangDiDrag = document.querySelector(".dragging");
+      const item = document.querySelector(".dragging");
 
-      if (penaSedangDiDrag && penaSedangDiDrag.classList.contains("pena-dalam-gelas")) {
+      if (item && item.classList.contains("pena-dalam-gelas")) {
 
-        const gelas = penaSedangDiDrag.parentElement;
+        const gelas = item.parentElement;
         const jumlahLabel = gelas.nextSibling;
 
-        penaSedangDiDrag.remove();
+        item.remove();
 
         gelas.dataset.jumlah = parseInt(gelas.dataset.jumlah) - 1;
-        jumlahLabel.innerText = `${gelas.dataset.jumlah} pena`;
+        jumlahLabel.innerText = `${gelas.dataset.jumlah} item`;
       }
     });
 
@@ -318,7 +308,7 @@
       });
 
       document.querySelectorAll(".jumlah-pena").forEach(l => {
-        l.innerText = "0 pena";
+        l.innerText = "0 item";
       });
 
       buatSoal();
